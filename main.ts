@@ -439,14 +439,19 @@ export default class CalendarPlugin extends Plugin {
         // Add file modification and rename listeners
         this.registerEvent(this.app.vault.on('modify', this.handleFileModify.bind(this)));
         this.registerEvent(this.app.vault.on('rename', this.handleFileRename.bind(this)));
+        this.registerEvent(this.app.vault.on('delete', this.handleFileDelete.bind(this)));
     }
 
     async handleFileModify(file: TFile) {
         console.log(`File modified: ${file.path}`);
-        // Perform your action here
-        // For example, you might want to reload the calendar events
+        // this should be better
         await this.eventStore.loadCalendarFiles();
         this.calendarView.calendar.refetchEvents();
+    }
+
+    async handleFileDelete(file: TFile) {
+        console.log(`File deleted: ${file.path}`);
+        this.calendarView.calendar.getEventById(file.path)?.remove();
     }
 
     async handleFileRename(file: TFile, oldPath: string) {
