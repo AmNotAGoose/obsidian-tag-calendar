@@ -85,11 +85,11 @@ class EventStore {
                 const backgroundColor = await this.getTagColor(file);
                 await this.calendarView.calendarReady;
                 if (endDate && startDate){
-                    console.log("updateView(): ", {title: file.name, start: startDate, end: endDate, id: file.path, backgroundColor});
-                    this.calendarView.calendar.addEvent({title: file.name, start: startDate, end: endDate, id: file.path, backgroundColor});
+                    console.log("updateView(): ", {title: file.basename, start: startDate, end: endDate, id: file.path, backgroundColor});
+                    this.calendarView.calendar.addEvent({title: file.basename, start: startDate, end: endDate, id: file.path, backgroundColor});
                 } else if (startDate) {
-                    console.log("updateView(): ", {title: file.name, start: startDate, id: file.path, backgroundColor});
-                    this.calendarView.calendar.addEvent({title: file.name, start: startDate, id: file.path, backgroundColor});
+                    console.log("updateView(): ", {title: file.basename, start: startDate, id: file.path, backgroundColor});
+                    this.calendarView.calendar.addEvent({title: file.basename, start: startDate, id: file.path, backgroundColor});
                 }
             }
             console.log("updateView(): updated view");
@@ -114,7 +114,7 @@ class EventStore {
         const content = matter.stringify('', frontmatterData);
     
         // Generate a new file path (you may want to customize the naming convention)
-        const newPath = `/${title.replace(/\s+/g, '-').toLowerCase()}.md`;
+        const newPath = `/${title}.md`;
     
         // Create the new event file in the vault
         const file = await this.app.vault.create(newPath, content);
@@ -137,11 +137,11 @@ class EventStore {
             const backgroundColor = await this.getTagColor(file);
             await this.calendarView.calendarReady;
             if (endDate && startDate){
-                console.log("addEventToView(): ", {title: file.name, start: startDate, end: endDate, id: file.path, backgroundColor});
-                this.calendarView.calendar.addEvent({title: file.name, start: startDate, end: endDate, id: file.path, backgroundColor});
+                console.log("addEventToView(): ", {title: file.basename, start: startDate, end: endDate, id: file.path, backgroundColor: backgroundColor});
+                this.calendarView.calendar.addEvent({title: file.basename, start: startDate, end: endDate, id: file.path, backgroundColor: backgroundColor});
             } else if (startDate) {
-                console.log("addEventToView(): ", {title: file.name, start: startDate, id: file.path, backgroundColor});
-                this.calendarView.calendar.addEvent({title: file.name, start: startDate, id: file.path, backgroundColor});
+                console.log("addEventToView(): ", {title: file.basename, start: startDate, id: file.path, backgroundColor: backgroundColor});
+                this.calendarView.calendar.addEvent({title: file.basename, start: startDate, id: file.path, backgroundColor: backgroundColor});
             }
             console.log("addEventToView(): updated view");
             this.updating = false;

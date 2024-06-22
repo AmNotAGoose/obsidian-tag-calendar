@@ -156,6 +156,7 @@ export class CalendarView extends ItemView {
             initialView: 'dayGridMonth',
             selectable: true,
             editable: true,
+            eventBorderColor: 'transparent',
             eventDrop: this.handleEventDrop.bind(this),
             eventClick: this.handleEventClick.bind(this),
             select: this.handleDateSelect.bind(this)  // Add the select callback here
@@ -255,6 +256,7 @@ class DateSelectModal extends Modal {
 		.setButtonText('Save')
 		.onClick(() => {
 			const title = titleInput.getValue();
+            console.log(title)
 			const startDate = new Date(startDateInput.getValue());
 			const tags = tagsInput.getValue().split(" ");
 	
