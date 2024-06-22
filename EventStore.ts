@@ -48,10 +48,10 @@ class EventStore {
             console.error(`File not found: ${event.id}`);
             return;
         }
-
+    
         const content = await this.app.vault.read(file);
         const fileData = this.getFrontmatter(content);
-
+    
         fileData['start-date'] = this.formatDate(event.start);
         if (event.end) {
             const endDate = new Date(event.end);
@@ -60,12 +60,21 @@ class EventStore {
         } else {
             delete fileData['end-date'];
         }
-
-        const updatedContent = this.stringifyFrontmatter(fileData, content);
-
+    
+        const updatedContent = this.stringifyFrontmatter2(fileData, this.removeFrontmatter(content));
+    
         await this.app.vault.modify(file, updatedContent);
     }
-
+    
+    removeFrontmatter(content: string): string {
+        return content.replace(/---\n[\s\S]*?\n---\n/, '');
+    }
+    
+    stringifyFrontmatter2(data: any, content: string = ''): string {
+        const frontmatter = yaml.dump(data);
+        return `---\n${frontmatter}---\n${content}`;
+    }
+    
     async updateView() {
         if (!this.updating) {
             this.updating = true;
@@ -162,7 +171,7 @@ class EventStore {
         const d = new Date(date);
         const year = d.getFullYear();
         const month = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
+        const day = String(d.getDate() + 1).padStart(2, '0');
         return `${year}-${month}-${day}`;
     }
 
@@ -170,7 +179,7 @@ class EventStore {
         const d = new Date(date);
         const year = d.getFullYear();
         const month = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
+        const day = String(d.getDate() + 2).padStart(2, '0');
         return `${year}-${month}-${day}`;
     }
 
