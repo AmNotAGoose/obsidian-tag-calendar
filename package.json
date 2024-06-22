@@ -12,6 +12,7 @@
 	"author": "",
 	"license": "MIT",
 	"devDependencies": {
+		"@types/js-yaml": "^4.0.9",
 		"@types/node": "^16.11.6",
 		"@typescript-eslint/eslint-plugin": "5.29.0",
 		"@typescript-eslint/parser": "5.29.0",
@@ -29,6 +30,8 @@
 		"css-loader": "^7.1.2",
 		"fullcalendar": "^6.1.14",
 		"gray-matter": "^4.0.3",
-		"style-loader": "^4.0.0"
+		"js-yaml": "^4.1.0",
+		"style-loader": "^4.0.0",
+		"yaml": "^2.4.5"
 	}
 }

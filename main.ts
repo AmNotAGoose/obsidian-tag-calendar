@@ -4,7 +4,8 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import EventStore from './EventStore';
-import matter from 'gray-matter';
+import { Buffer } from 'buffer';
+
 
 // Define interface and default settings
 interface CalendarPluginSettings {
@@ -17,7 +18,37 @@ const DEFAULT_SETTINGS: CalendarPluginSettings = {
 
 const VIEW_TYPE_CALENDAR = "calendar-view";
 
+function parseFrontMatter(content: string): { data: any, content: string } {
+    const matter: any = { data: {}, content: "" };
+    const matterRegex = /^---\n([\s\S]*?)\n---/;
+    const match = content.match(matterRegex);
+    if (match) {
+        const rawData = match[1];
+        matter.content = content.slice(match[0].length);
 
+        // Parse the front matter data
+        rawData.split('\n').forEach(line => {
+            const [key, ...value] = line.split(':');
+            if (key && value.length) {
+                matter.data[key.trim()] = value.join(':').trim();
+            }
+        });
+    } else {
+        matter.content = content;
+    }
+    return matter;
+}
+
+function stringifyFrontMatter(data: any, content: string): string {
+    let frontMatter = '---\n';
+    for (const key in data) {
+        if (data.hasOwnProperty(key)) {
+            frontMatter += `${key}: ${data[key]}\n`;
+        }
+    }
+    frontMatter += '---\n';
+    return frontMatter + content;
+}
 class EventEditModal extends Modal {
     event: any;
     plugin: CalendarPlugin;
@@ -43,7 +74,6 @@ class EventEditModal extends Modal {
         const tags = await this.getTagsFromFile();
         tagsInput.setValue(tags);
 
-
         // Buttons
         const buttonsEl = contentEl.createDiv({ cls: 'modal-buttons' });
 
@@ -62,14 +92,14 @@ class EventEditModal extends Modal {
         this.addStyles();
     }
 
-	async updateFile(newTags: string) {
+    async updateFile(newTags: string) {
         try {
             const file = this.plugin.app.vault.getAbstractFileByPath(this.filePath);
             if (file instanceof TFile) {
                 const fileContent = await this.plugin.app.vault.read(file);
-                const parsed = matter(fileContent);
+                const parsed = parseFrontMatter(fileContent);
                 parsed.data.tags = newTags.split(',').map(tag => tag.trim());
-                const newContent = matter.stringify(parsed.content, parsed.data);
+                const newContent = stringifyFrontMatter(parsed.data, parsed.content);
                 await this.plugin.app.vault.modify(file, newContent);
             } else {
                 console.error("File not found or is not a valid file:", this.filePath);
@@ -108,7 +138,7 @@ class EventEditModal extends Modal {
             const file = this.plugin.app.vault.getAbstractFileByPath(this.filePath);
             if (file instanceof TFile) {
                 const fileContent = await this.plugin.app.vault.read(file);
-                const parsed = matter(fileContent);
+                const parsed = parseFrontMatter(fileContent);
                 const tags = parsed.data.tags;
                 return tags ? tags.join(' ') : '';
             } else {
